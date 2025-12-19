@@ -1,0 +1,12 @@
+{
+    "name": "exterex.github.io",
+    "image":"mcr.microsoft.com/devcontainers/universal:2",
+    "features": {},
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "github.copilot-chat"
+            ]
+        }
+    }
+}
