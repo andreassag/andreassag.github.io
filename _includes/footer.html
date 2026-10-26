@@ -1,2 +1,210 @@
+      <footer class="portfolio-footer">
+        <div>&copy; {{ 'now' | date: "%Y" }} {{ user.name | default: user.login }}</div>
+      </footer>
+    </div>
+
+    <script>
+      (function() {
+        // Theme switcher
+        var themeButtons = document.querySelectorAll('.theme-toggle-btn');
+
+        function applyTheme(theme, save) {
+          if (save) {
+            try { localStorage.setItem('theme', theme); } catch(e) {}
+          }
+          if (theme === 'system') {
+            document.documentElement.removeAttribute('data-theme');
+          } else {
+            document.documentElement.setAttribute('data-theme', theme);
+          }
+          themeButtons.forEach(function(btn) {
+            if (btn.getAttribute('data-theme-val') === theme) {
+              btn.classList.add('active');
+            } else {
+              btn.classList.remove('active');
+            }
+          });
+        }
+
+        var savedTheme = 'system';
+        try {
+          savedTheme = localStorage.getItem('theme') || 'system';
+        } catch(e) {}
+        applyTheme(savedTheme, false);
+
+        themeButtons.forEach(function(btn) {
+          btn.addEventListener('click', function() {
+            var val = btn.getAttribute('data-theme-val');
+            applyTheme(val, true);
+          });
+        });
+
+        // Listen for system theme changes when user preference is 'system'
+        if (window.matchMedia) {
+          window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function() {
+            var current = 'system';
+            try { current = localStorage.getItem('theme') || 'system'; } catch(e) {}
+            if (current === 'system') {
+              applyTheme('system', false);
+            }
+          });
+        }
+
+        // Repository showcase interactive controller
+        var repoGrid = document.getElementById('repo-grid');
+        if (!repoGrid) return;
+
+        var cards = Array.from(repoGrid.querySelectorAll('.repo-card'));
+        var langContainer = document.getElementById('language-filters');
+        var sortSelect = document.getElementById('projects-sort');
+        var archivedToggle = document.getElementById('archived-toggle');
+        var archivedToggleText = document.getElementById('archived-toggle-text');
+        var archivedBadge = document.getElementById('archived-count-badge');
+        var counterEl = document.getElementById('projects-counter');
+        var emptyState = document.getElementById('repo-empty-state');
+
+        var currentLang = 'all';
+        var showArchived = false;
+
+        // Count archived repositories
+        var archivedCards = cards.filter(function(c) {
+          return c.getAttribute('data-archived') === 'true';
+        });
+
+        if (archivedBadge) {
+          archivedBadge.textContent = '(' + archivedCards.length + ')';
+          if (archivedCards.length === 0 && archivedToggle) {
+            archivedToggle.style.display = 'none';
+          }
+        }
+
+        // Dynamically build language pills
+        var languages = [];
+        cards.forEach(function(c) {
+          var l = c.getAttribute('data-language');
+          if (l && languages.indexOf(l) === -1) {
+            languages.push(l);
+          }
+        });
+        languages.sort();
+
+        if (langContainer) {
+          languages.forEach(function(lang) {
+            var btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'filter-pill';
+            btn.setAttribute('data-lang', lang);
+            btn.textContent = lang;
+            btn.addEventListener('click', function() {
+              setLanguage(lang);
+            });
+            langContainer.appendChild(btn);
+          });
+
+          var allBtn = langContainer.querySelector('[data-lang="all"]');
+          if (allBtn) {
+            allBtn.addEventListener('click', function() {
+              setLanguage('all');
+            });
+          }
+        }
+
+        function setLanguage(lang) {
+          currentLang = lang;
+          if (langContainer) {
+            var pills = langContainer.querySelectorAll('.filter-pill');
+            pills.forEach(function(p) {
+              if (p.getAttribute('data-lang') === lang) {
+                p.classList.add('active');
+              } else {
+                p.classList.remove('active');
+              }
+            });
+          }
+          filterAndRender();
+        }
+
+        if (archivedToggle) {
+          archivedToggle.addEventListener('click', function() {
+            showArchived = !showArchived;
+            if (showArchived) {
+              archivedToggle.classList.add('active');
+              archivedToggle.setAttribute('aria-pressed', 'true');
+              if (archivedToggleText) archivedToggleText.textContent = 'Hide Archived';
+            } else {
+              archivedToggle.classList.remove('active');
+              archivedToggle.setAttribute('aria-pressed', 'false');
+              if (archivedToggleText) archivedToggleText.textContent = 'Show Archived';
+            }
+            filterAndRender();
+          });
+        }
+
+        if (sortSelect) {
+          sortSelect.addEventListener('change', function() {
+            sortCards(sortSelect.value);
+          });
+        }
+
+        function sortCards(criterion) {
+          cards.sort(function(a, b) {
+            if (criterion === 'stars') {
+              var starsA = parseInt(a.getAttribute('data-stars') || '0', 10) || 0;
+              var starsB = parseInt(b.getAttribute('data-stars') || '0', 10) || 0;
+              if (starsB !== starsA) return starsB - starsA;
+              var upA = parseInt(a.getAttribute('data-updated') || '0', 10) || 0;
+              var upB = parseInt(b.getAttribute('data-updated') || '0', 10) || 0;
+              return upB - upA;
+            } else {
+              var upA = parseInt(a.getAttribute('data-updated') || '0', 10) || 0;
+              var upB = parseInt(b.getAttribute('data-updated') || '0', 10) || 0;
+              if (upB !== upA) return upB - upA;
+              var starsA = parseInt(a.getAttribute('data-stars') || '0', 10) || 0;
+              var starsB = parseInt(b.getAttribute('data-stars') || '0', 10) || 0;
+              return starsB - starsA;
+            }
+          });
+
+          cards.forEach(function(card) {
+            repoGrid.appendChild(card);
+          });
+          if (emptyState) {
+            repoGrid.appendChild(emptyState);
+          }
+        }
+
+        function filterAndRender() {
+          var visibleCount = 0;
+          cards.forEach(function(card) {
+            var isArchived = card.getAttribute('data-archived') === 'true';
+            var cardLang = card.getAttribute('data-language') || '';
+
+            var passArchive = !isArchived || showArchived;
+            var passLang = (currentLang === 'all') || (cardLang.toLowerCase() === currentLang.toLowerCase());
+
+            if (passArchive && passLang) {
+              card.style.display = '';
+              visibleCount++;
+            } else {
+              card.style.display = 'none';
+            }
+          });
+
+          if (counterEl) {
+            counterEl.textContent = '(' + visibleCount + ')';
+          }
+
+          if (emptyState) {
+            emptyState.style.display = (visibleCount === 0) ? 'block' : 'none';
+          }
+        }
+
+        // Initial sort & filter run
+        if (sortSelect) {
+          sortCards(sortSelect.value);
+        }
+        filterAndRender();
+      })();
+    </script>
   </body>
 </html>

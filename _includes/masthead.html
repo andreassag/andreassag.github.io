@@ -1,54 +1,54 @@
-{% if site.layout == 'stacked' %}
-  {% assign metadata_styles = 'd-md-inline-block mx-3 mb-1 mb-md-0' %}
-{% else %}
-  {% assign metadata_styles = 'd-flex flex-items-center mb-3' %}
-{% endif %}
+<div class="profile-header">
+  <img src="{{ user.avatar_url }}" alt="{{ user.name | default: user.login }}" class="profile-avatar">
+  <div class="profile-info">
+    <div class="d-flex flex-wrap flex-items-center" style="gap: 0.65rem; margin-bottom: 0.25rem;">
+      <h1 class="profile-name">{% if user.name %}{{ user.name }}{% else %}{{ user.login }}{% endif %}</h1>
+      {% if user.hireable %}
+        <span class="hireable-badge">Available for hire</span>
+      {% endif %}
+    </div>
 
-<img src="{{ user.avatar_url }}" class="circle mb-3" style="max-width: 150px;">
-<h1 class="{% if site.style == 'dark' %}text-white{% endif %} mb-2 lh-condensed">{% if user.name %}{{ user.name }}{% else %}{{ user.login }}{% endif %}</h1>
-<p class="mb-3 f4 {% if site.style == 'dark' %}text-white{% else %}text-gray{% endif %}">
-  {{ user.bio }}
-</p>
+    {% if user.bio %}
+      <p class="profile-bio">{{ user.bio }}</p>
+    {% endif %}
 
-{% if include.metadata %}
-  <div class="f4 mb-6">
-    {% if user.name %}
-      <div class="{{ metadata_styles }}">
-        {% octicon mark-github height:20 class:"mr-2 v-align-middle" fill:{{ icon_color }} aria-label:GitHub %}
-        <a href="https://github.com/{{ user.login }}" {% if site.style == 'dark' %}class="text-white"{% endif %}>
-          @{{ user.login }}
-        </a>
-      </div>
-    {% endif %}
-    {% if user.email %}
-      <div class="{{ metadata_styles }}">
-        {% octicon mail height:20 class:"mr-2 v-align-middle" fill:{{ icon_color }} aria-label:email %}
-        <a href="mailto:{{ user.email }}" {% if site.style == 'dark' %}class="text-white"{% endif %}>
-          {{ user.email }}
-        </a>
-      </div>
-    {% endif %}
-    {% if user.location %}
-      <div class="{{ metadata_styles }} {% if site.style == 'dark' %}text-white{% endif %}">
-        {% octicon location height:20 class:"mr-2 v-align-middle" fill:{{ icon_color }} aria-label:Location %}
-        {{ user.location }}
-      </div>
-    {% endif %}
-    {% if site.social_media %}
-      <div class="d-flex flex-wrap flex-items-start {% if site.layout == 'stacked' %}flex-justify-center mt-1 mt-md-3{% endif %}">
-        {% for account in site.social_media %}
-          <div class="{% unless forloop.last == true %}mr-3{% endunless %} mb-3">
-            {% assign service_shortname = account[0] %}
-            {% assign service = site.data.social_media[service_shortname] %}
-            <a href="{{ service.profile_url_prefix }}{{ account[1] }}" class="tooltipped tooltipped-se" aria-label="{{ service.name }}: {{ account[1] }}">
-              {{ service.icon_svg }}<span class="d-none">{{ service.name }}</span>
-            </a>
+    {% if include.metadata != false %}
+      <div class="profile-meta-row">
+        {% if user.login %}
+          <a href="https://github.com/{{ user.login }}" class="profile-meta-item" title="GitHub" target="_blank" rel="noopener noreferrer">
+            <svg height="16" width="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg>
+            <span>@{{ user.login }}</span>
+          </a>
+        {% endif %}
+
+        {% if user.location %}
+          <span class="profile-meta-item" title="Location">
+            <svg height="16" width="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M11.536 3.464a5 5 0 010 7.072L8 14.07l-3.536-3.535a5 5 0 117.072-7.072v.001zm1.06 8.132a6.5 6.5 0 10-9.192 0l3.535 3.536a1.5 1.5 0 002.122 0l3.535-3.536zM8 9a2 2 0 100-4 2 2 0 000 4z"></path></svg>
+            <span>{{ user.location }}</span>
+          </span>
+        {% endif %}
+
+        {% if user.email %}
+          <a href="mailto:{{ user.email }}" class="profile-meta-item" title="Email">
+            <svg height="16" width="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M1.75 2A1.75 1.75 0 000 3.75v.736l8 4.48 8-4.48V3.75A1.75 1.75 0 0014.25 2H1.75zM16 5.67l-7.74 4.333a.5.5 0 01-.52 0L0 5.67v6.58A1.75 1.75 0 001.75 14h12.5A1.75 1.75 0 0016 12.25V5.67z"></path></svg>
+            <span>{{ user.email }}</span>
+          </a>
+        {% endif %}
+
+        {% if site.social_media %}
+          <div class="profile-social-links">
+            {% for account in site.social_media %}
+              {% assign service_shortname = account[0] %}
+              {% assign service = site.data.social_media[service_shortname] %}
+              {% if service %}
+                <a href="{{ service.profile_url_prefix }}{{ account[1] }}" class="profile-social-link" title="{{ service.name }}: {{ account[1] }}" target="_blank" rel="noopener noreferrer">
+                  {{ service.icon_svg }}
+                </a>
+              {% endif %}
+            {% endfor %}
           </div>
-        {% endfor %}
+        {% endif %}
       </div>
-    {% endif %}
-    {% if user.hireable %}
-      <span title="Hire me" class="d-inline-block f5 rounded-2 text-white bg-green py-1 px-2">Available for hire</span>
     {% endif %}
   </div>
-{% endif %}
+</div>

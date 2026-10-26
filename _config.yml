@@ -1,5 +1,5 @@
-layout: sidebar
-style: light
+layout: stacked
+style: auto
 
 plugins:
   - jekyll-octicons
@@ -18,7 +18,7 @@ defaults:
 
 projects:
   sort_by: stars
-  limit: 9
+  limit: 50
   exclude:
     archived: false
     forks: true

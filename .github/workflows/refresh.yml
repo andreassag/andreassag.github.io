@@ -1,14 +1,27 @@
 name: Refresh
 
-on:
+"on":
   workflow_dispatch:
   schedule:
-    - cron: "0 0 1 * *"
+    - cron: "0 0 * * 1"
+
+permissions:
+  actions: write
+  contents: read
 
 jobs:
   refresh:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Keep workflow active via GitHub API
+        uses: gautamkrishnar/keepalive-workflow@v2
+        with:
+          use_api: true
+          time_elapsed: "0"
+
       - name: Trigger GitHub pages rebuild
         run: |
           curl --fail --request POST \

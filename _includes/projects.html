@@ -1,13 +1,35 @@
-<h2 {% if site.style == 'dark' %}class="text-white"{% endif %}>My Projects</h2>
-<p class="f4 mb-4 {% if site.style == 'dark' %}text-white{% else %}text-gray{% endif %}">GitHub repositories that I've built.</p>
-<div class="d-sm-flex flex-wrap gutter-condensed mb-4">
+<div class="projects-section">
+  <div class="projects-header">
+    <h2 class="projects-title">
+      Projects
+      <span class="projects-counter" id="projects-counter"></span>
+    </h2>
+  </div>
+
+  <div class="projects-toolbar">
+    <div class="filter-pills" id="language-filters" role="group" aria-label="Filter projects by language">
+      <button type="button" class="filter-pill active" data-lang="all">All</button>
+    </div>
+
+    <div class="projects-actions">
+      <select id="projects-sort" class="sort-select" aria-label="Sort projects">
+        <option value="stars" {% if site.projects.sort_by == 'stars' %}selected{% endif %}>★ Most Stars</option>
+        <option value="updated" {% if site.projects.sort_by != 'stars' %}selected{% endif %}>⏱ Recently Updated</option>
+      </select>
+
+      <button type="button" id="archived-toggle" class="archived-toggle-btn" aria-pressed="false">
+        <span id="archived-toggle-text">Show Archived</span> <span id="archived-count-badge"></span>
+      </button>
+    </div>
+  </div>
+
   {% if site.projects.sort_by == 'stars' %}
-    {% assign sort_order = 'stargazers_count', 'last' %}
+    {% assign sort_order = 'stargazers_count' %}
   {% else %}
     {% assign sort_order = 'pushed_at' %}
   {% endif %}
 
-  {% if site.projects.exclude.archived && site.projects.exclude.forks %}
+  {% if site.projects.exclude.archived and site.projects.exclude.forks %}
     {% assign filtered_repos = site.github.public_repositories | where:'archived', false | where:'fork', false | sort: sort_order | reverse %}
   {% elsif site.projects.exclude.archived %}
     {% assign filtered_repos = site.github.public_repositories | where:'archived', false | sort: sort_order | reverse %}
@@ -17,11 +39,14 @@
     {% assign filtered_repos = site.github.public_repositories | sort: sort_order | reverse %}
   {% endif %}
 
-  {% for repository in filtered_repos | limit: site.projects.limit %}
-    {% unless site.projects.exclude.projects contains repository.name %}
-      <div class="col-sm-6 col-md-12 col-lg-6 col-xl-4 mb-3">
+  <div class="repo-grid" id="repo-grid">
+    {% for repository in filtered_repos limit: site.projects.limit %}
+      {% unless site.projects.exclude.projects contains repository.name %}
         {% include repo-card.html %}
-      </div>
-    {% endunless %}
-  {% endfor %}
+      {% endunless %}
+    {% endfor %}
+    <div id="repo-empty-state" class="repo-empty-state" style="display: none;">
+      No projects match the selected filters.
+    </div>
+  </div>
 </div>
