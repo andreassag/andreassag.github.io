@@ -1,14 +1,14 @@
 {% if topic.web_url %}
   <a href="{{ topic.web_url }}" class="tech-stack-pill" target="_blank" rel="noopener noreferrer">
     {% if topic.image_url %}
-      <img src="{{ topic.image_url }}" alt="{{ topic.name }}" loading="lazy">
+      <img src="{{ topic.image_url }}" alt="{{ topic.name }}" width="16" height="16" style="width: 16px; height: 16px; object-fit: contain;" loading="lazy">
     {% endif %}
     <span>{{ topic.name }}</span>
   </a>
 {% else %}
   <span class="tech-stack-pill">
     {% if topic.image_url %}
-      <img src="{{ topic.image_url }}" alt="{{ topic.name }}" loading="lazy">
+      <img src="{{ topic.image_url }}" alt="{{ topic.name }}" width="16" height="16" style="width: 16px; height: 16px; object-fit: contain;" loading="lazy">
     {% endif %}
     <span>{{ topic.name }}</span>
   </span>

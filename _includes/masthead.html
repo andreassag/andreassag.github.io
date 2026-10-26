@@ -1,5 +1,5 @@
 <div class="profile-header">
-  <img src="{{ user.avatar_url }}" alt="{{ user.name | default: user.login }}" class="profile-avatar">
+  <img src="{{ user.avatar_url }}" alt="{{ user.name | default: user.login }}" class="profile-avatar" width="88" height="88" style="width: 88px; height: 88px; border-radius: 50%; object-fit: cover;">
   <div class="profile-info">
     <div class="d-flex flex-wrap flex-items-center" style="gap: 0.65rem; margin-bottom: 0.25rem;">
       <h1 class="profile-name">{% if user.name %}{{ user.name }}{% else %}{{ user.login }}{% endif %}</h1>
