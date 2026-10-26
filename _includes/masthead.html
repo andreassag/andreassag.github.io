@@ -3,9 +3,6 @@
   <div class="profile-info">
     <div class="d-flex flex-wrap flex-items-center" style="gap: 0.65rem; margin-bottom: 0.25rem;">
       <h1 class="profile-name">{% if user.name %}{{ user.name }}{% else %}{{ user.login }}{% endif %}</h1>
-      {% if user.hireable %}
-        <span class="hireable-badge">Available for hire</span>
-      {% endif %}
     </div>
 
     {% if user.bio %}
